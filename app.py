@@ -86,6 +86,24 @@ def index():
         return render_template("index.html", birthdays=birthdays)
 
 
+# Delete Route
+@app.route("/delete", methods=["POST"])
+def delete():
+    # Check for session of current user
+    user_id = session.get("user_id")
+    if not user_id:
+        return redirect("/login")
+
+    id_to_delete = request.form.get("id")
+
+    if id_to_delete:
+        db.execute(
+            "DELETE FROM birthdays WHERE id = ? AND user_id = ?", id_to_delete, user_id
+        )
+
+    return redirect("/")
+
+
 # Register Route
 @app.route("/register", methods=["GET", "POST"])
 def register():
