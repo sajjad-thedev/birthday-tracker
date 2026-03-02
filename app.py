@@ -30,15 +30,60 @@ def after_request(response):
 # Index Route
 @app.route("/", methods=["GET", "POST"])
 def index():
-    # Check for session of current user
-    if not session.get("user_id"):
-        return redirect("/login")
+    # POST Route for index
+    if request.method == "POST":
+        # Check for session of current user
+        if not session.get("user_id"):
+            return redirect("/login")
 
-    # Display birthdays for current user
-    birthdays = db.execute(
-        "SELECT * FROM birthdays WHERE user_id = ?", session["user_id"]
-    )
-    return render_template("index.html", birthdays=birthdays)
+        # Add the user's entry into the database
+        name = request.form.get("name")
+        month = request.form.get("month")
+        day = request.form.get("day")
+
+        # Validate Name
+        if not name or not all(c.isalpha() or c.isspace() for c in name):
+            return redirect("/")
+
+        # Validate Month and day
+        try:
+            month = int(month)
+        except (ValueError, TypeError):
+            return redirect("/")
+
+        if not 1 <= month <= 12:
+            return redirect("/")
+
+        try:
+            day = int(day)
+        except (ValueError, TypeError):
+            return redirect("/")
+
+        if not 1 <= day <= 31:
+            return redirect("/")
+
+        # Add data to database
+        db.execute(
+            "INSERT INTO birthdays (user_id, name, month, day) VALUES (?, ?, ?, ?)",
+            session["user_id"],
+            name,
+            month,
+            day,
+        )
+
+        return redirect("/")
+
+    # GET Route
+    else:
+        # Check for session of current user
+        if not session.get("user_id"):
+            return redirect("/login")
+
+        # Display birthdays for current user
+        birthdays = db.execute(
+            "SELECT * FROM birthdays WHERE user_id = ?", session["user_id"]
+        )
+        return render_template("index.html", birthdays=birthdays)
 
 
 # Register Route
