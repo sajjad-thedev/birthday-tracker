@@ -12,8 +12,8 @@ A full-stack web app to track and manage friends' birthdays — with secure auth
 
 > ⚠️ **Heads-up for demo viewers:**
 >
-> - The app is hosted on Render's free tier — it may take **30–60 seconds to wake up** after inactivity (cold start).
-> - Data is stored in **SQLite**, which resets on each redeploy. Birthdays you add may not persist long-term.
+> - The app is hosted on PythonAnywhere's free tier — no cold starts, it responds instantly.
+> - Data is stored in **SQLite**. The database persists across restarts but may be lost if the app is redeployed from scratch.
 
 ---
 
@@ -44,6 +44,9 @@ python -m venv venv && source venv/bin/activate
 pip install -r requirements.txt
 
 echo "SECRET_KEY=your-secret-key" > .env
+
+sqlite3 birthdays.db < schema.sql
+
 flask run
 ```
 
